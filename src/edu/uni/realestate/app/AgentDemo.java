@@ -5,6 +5,8 @@ import edu.uni.realestate.model.ApartmentRental;
 import edu.uni.realestate.model.HousePurchase;
 import edu.uni.realestate.model.HouseRental;
 import edu.uni.realestate.model.Property;
+import edu.uni.realestate.model.PurchaseTerms;
+import edu.uni.realestate.model.RentalTerms;
 import edu.uni.realestate.service.Agent;
 
 import java.util.HashMap;
@@ -60,6 +62,7 @@ public class AgentDemo {
         tryCreate("utilities = \"   \"",   HouseRental::new,       with(validHouseRental, "utilities", "   "));
         tryCreate("laundry = \"shared\"",  ApartmentPurchase::new, with(validApartmentPurchase, "laundry", "shared"));
         tryCreate("price = -5",            ApartmentPurchase::new, with(validApartmentPurchase, "price", "-5"));
+        tryCreate("price = 0",             ApartmentPurchase::new, with(validApartmentPurchase, "price", "0"));
         tryCreate("annual taxes = -1",     ApartmentPurchase::new, with(validApartmentPurchase, "taxes", "-1"));
         tryCreate("addProperty(null)",     data -> { agent.addProperty((Property) null); return null; }, null);
         System.out.println("Properties managed by the agent: " + agent.getProperties().size()
@@ -101,6 +104,13 @@ public class AgentDemo {
             System.out.println("agent.getProperties().clear() -> UnsupportedOperationException");
             System.out.println("Properties still managed: " + agent.getProperties().size());
         }
+
+        heading("6. Positive rent and price below one cent are accepted");
+        RentalTerms rentalTerms = new RentalTerms(map(
+                "rent", "0.001", "furnished", "no", "utilities", "included"));
+        PurchaseTerms purchaseTerms = new PurchaseTerms(map("price", "0.001", "taxes", "0"));
+        System.out.println("Monthly rent accepted: " + rentalTerms.getMonthlyRent());
+        System.out.println("Purchase price accepted: " + purchaseTerms.getPrice());
     }
 
     private static void tryCreate(String description, Function<Map<String, String>, Property> constructor,

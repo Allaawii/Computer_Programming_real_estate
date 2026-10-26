@@ -49,7 +49,14 @@ public class RentalTerms {
 
     public static Map<String, String> promptInit(Scanner in) {
         Map<String, String> data = new HashMap<>();
-        data.put("rent",      InputHelper.readDouble(in, "Monthly rent: ", 0.01));
+        String rent;
+        do {
+            rent = InputHelper.readDouble(in, "Monthly rent: ", 0);
+            if (Double.parseDouble(rent) == 0) {
+                System.out.println("  Monthly rent must be greater than 0.");
+            }
+        } while (Double.parseDouble(rent) == 0);
+        data.put("rent", rent);
         data.put("furnished", InputHelper.readYesNo(in, "Furnished? (yes/no): "));
         String utilities;
         do {

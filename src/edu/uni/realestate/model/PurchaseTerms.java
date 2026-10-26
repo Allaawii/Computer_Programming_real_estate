@@ -41,7 +41,14 @@ public class PurchaseTerms {
 
     public static Map<String, String> promptInit(Scanner in) {
         Map<String, String> data = new HashMap<>();
-        data.put("price", InputHelper.readDouble(in, "Purchase price: ", 0.01));
+        String price;
+        do {
+            price = InputHelper.readDouble(in, "Purchase price: ", 0);
+            if (Double.parseDouble(price) == 0) {
+                System.out.println("  Price must be greater than 0.");
+            }
+        } while (Double.parseDouble(price) == 0);
+        data.put("price", price);
         data.put("taxes", InputHelper.readDouble(in, "Estimated annual property taxes: ", 0));
         return data;
     }

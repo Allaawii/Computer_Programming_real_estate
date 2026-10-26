@@ -296,7 +296,7 @@ Apartment --> LaundryType
 
 ## Validation rules
 
-All rules live in the private setters. `InputHelper` re-prompts in the console, but the setters are the real guard, so a map built in code (as in `AgentDemo`) is checked by the same rules.
+Private setters enforce the numeric ranges and required utilities description, and enum parsing rejects unsupported choices. These checks also apply to maps built in code (as in `AgentDemo`). In the console, `InputHelper` re-prompts on invalid input. Boolean strings follow the assignment's `"yes".equalsIgnoreCase(text)` rule: `yes` becomes `true`, and any other value becomes `false`. The console restricts these strings to `yes` or `no`; direct maps must supply the correct strings themselves.
 
 | Class | Field | Map key | Type | Valid values |
 |---|---|---|---|---|
@@ -321,7 +321,7 @@ Parsing follows the assignment: `Integer.parseInt` / `Double.parseDouble` for nu
 | Method | Accepts |
 |---|---|
 | `readInt(Scanner in, String prompt, int min)` | a whole number of at least `min` |
-| `readDouble(Scanner in, String prompt, double min)` | a finite number of at least `min` (rent and price use `0.01`, taxes use `0`) |
+| `readDouble(Scanner in, String prompt, double min)` | a finite number of at least `min`; rent, price and taxes use `0`, and the rent and price prompts additionally reject zero |
 | `readYesNo(Scanner in, String prompt)` | `yes` or `no`, any letter case |
 | `readChoice(Scanner in, String prompt, String... options)` | one of the options, any letter case |
 
@@ -401,10 +401,11 @@ There is no property #7.
 
 `AgentDemo` (package `app`) needs no keyboard input. It builds one object of each concrete class directly from a `Map` and shows that:
 
-1. invalid values are rejected (every rule in the validation table, plus a non-numeric value and `addProperty(null)`),
+1. invalid numeric ranges, unsupported enum values, blank utilities, a non-numeric value and `addProperty(null)` are rejected,
 2. closing a property twice is rejected (`closeDeal` returns `false`, and calling `close()` again throws `IllegalStateException`),
 3. closed properties disappear from the available list (`displayProperties(false)` vs `displayProperties(true)`),
-4. and, as an extra check, that the list returned by `getProperties()` cannot be modified.
+4. the list returned by `getProperties()` cannot be modified,
+5. and positive rent and price values below one cent are accepted.
 
 Output of `java -cp out edu.uni.realestate.app.AgentDemo`:
 
@@ -463,6 +464,7 @@ monthly rent = 0       -> rejected: Monthly rent must be greater than 0
 utilities = "   "      -> rejected: Utilities description cannot be blank
 laundry = "shared"     -> rejected: Laundry must be one of: ensuite, coin, offsite
 price = -5             -> rejected: Price must be greater than 0
+price = 0              -> rejected: Price must be greater than 0
 annual taxes = -1      -> rejected: Annual property taxes cannot be negative
 addProperty(null)      -> rejected: Property cannot be null
 Properties managed by the agent: 4 (no invalid object was added)
@@ -544,6 +546,10 @@ No properties to show.
 === 5. getProperties() is read-only ===
 agent.getProperties().clear() -> UnsupportedOperationException
 Properties still managed: 4
+
+=== 6. Positive rent and price below one cent are accepted ===
+Monthly rent accepted: 0.001
+Purchase price accepted: 0.001
 ```
 
 ---
